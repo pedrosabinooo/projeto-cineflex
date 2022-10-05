@@ -1,15 +1,16 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import styled from "styled-components";
 import Footer from "./Footer";
 
 export default function MoviePage() {
   const [movie, setMovie] = useState({});
   const [days, setDays] = useState([]);
-  const ID_DO_FILME = 1;
+  const { MOVIE_ID } = useParams();
 
   useEffect(() => {
-    const URL = `https://mock-api.driven.com.br/api/v5/cineflex/movies/${ID_DO_FILME}/showtimes`;
+    const URL = `https://mock-api.driven.com.br/api/v5/cineflex/movies/${MOVIE_ID}/showtimes`;
     axios
       .get(URL)
       .then((r) => {
@@ -31,9 +32,11 @@ export default function MoviePage() {
               <p>{[d.weekday, " - ", d.date].join("")}</p>
               <div>
                 {d.showtimes.map((st) => (
-                  <ShowtimeButtomStyled key={st.id}>
-                    {st.name}
-                  </ShowtimeButtomStyled>
+                  <Link to={`/session/${st.id}`} key={st.id}>
+                    <ShowtimeButtomStyled key={st.id}>
+                      {st.name}
+                    </ShowtimeButtomStyled>
+                  </Link>
                 ))}
               </div>
             </DayStyled>

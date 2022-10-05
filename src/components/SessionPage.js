@@ -1,16 +1,17 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import styled from "styled-components";
 import Footer from "./Footer";
 
 export default function SessionPage() {
   const [session, setSession] = useState({});
   const [seats, setSeats] = useState([]);
-  const [selectedSeat, setSelectedSeat] = useState([]);
-  const ID_DA_SESSAO = 1;
+  const [selectedSeats, setSelectedSeats] = useState([]);
+  const { SESSION_ID } = useParams();
 
   useEffect(() => {
-    const URL = `https://mock-api.driven.com.br/api/v5/cineflex/showtimes/${ID_DA_SESSAO}/seats`;
+    const URL = `https://mock-api.driven.com.br/api/v5/cineflex/showtimes/${SESSION_ID}/seats`;
     axios
       .get(URL)
       .then((r) => {
@@ -25,15 +26,28 @@ export default function SessionPage() {
       .catch((e) => console.log(e.response.data));
   }, []);
 
+  function bookSeat(bookingInfo) {
+    const URL = `https://mock-api.driven.com.br/api/v5/cineflex/seats/book-many`;
+    axios
+      .post(URL, bookingInfo)
+      .then((r) => {
+        console.log(bookingInfo);
+        console.log(r.data);
+      })
+      .catch((e) => console.log(e.response.data));
+  }
+
   console.log(seats);
-  console.log(selectedSeat);
+  console.log(selectedSeats);
 
   function chooseSeat(s) {
     if (s.isAvailable) {
-      if (selectedSeat.includes(s.name)) {
-        setSelectedSeat(selectedSeat.filter((selected) => selected !== s.name));
+      if (selectedSeats.includes(s.name)) {
+        setSelectedSeats(
+          selectedSeats.filter((selected) => selected !== s.name)
+        );
       } else {
-        setSelectedSeat([...selectedSeat, s.name]);
+        setSelectedSeats([...selectedSeats, s.name]);
       }
     }
   }
@@ -47,7 +61,7 @@ export default function SessionPage() {
             <SeatStyled
               key={s.id}
               isAvailable={s.isAvailable}
-              isSelected={selectedSeat.includes(s.name)}
+              isSelected={selectedSeats.includes(s.name)}
               onClick={() => chooseSeat(s)}
             >
               {s.name}
@@ -56,15 +70,27 @@ export default function SessionPage() {
         </SeatsStyled>
         <SeatLegendStyled>
           <div>
-            <SeatStyled isAvailable={true} isSelected={true} className="legend" />
+            <SeatStyled
+              isAvailable={true}
+              isSelected={true}
+              className="legend"
+            />
             <p>Selecionado</p>
           </div>
           <div>
-            <SeatStyled isAvailable={true} isSelected={false} className="legend" />
+            <SeatStyled
+              isAvailable={true}
+              isSelected={false}
+              className="legend"
+            />
             <p>Disponível</p>
           </div>
           <div>
-            <SeatStyled isAvailable={false} isSelected={false} className="legend" />
+            <SeatStyled
+              isAvailable={false}
+              isSelected={false}
+              className="legend"
+            />
             <p>Indiponível</p>
           </div>
         </SeatLegendStyled>
@@ -74,7 +100,19 @@ export default function SessionPage() {
           <p>CPF do comprador:</p>
           <input placeholder="Digite seu CPF..." required></input>
         </SessionPageFormStyled>
-        <BookButtomStyled>Reservar assento(s)</BookButtomStyled>
+        <Link to="/success">
+          <BookButtomStyled
+            onClick={() =>
+              bookSeat({
+                ids: selectedSeats,
+                name: "Fulano",
+                cpf: "12312312312",
+              })
+            }
+          >
+            Reservar assento(s)
+          </BookButtomStyled>
+        </Link>
       </SessionPageStyled>
       <Footer
         movieTitle={session.title}
@@ -174,7 +212,6 @@ const SessionPageFormStyled = styled.form`
 const BookButtomStyled = styled.button`
   width: 225px;
   height: 40px;
-  margin-right: 8px;
   background: #e8833a;
   border: 0;
   border-radius: 3px;

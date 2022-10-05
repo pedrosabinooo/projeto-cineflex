@@ -12,8 +12,8 @@ export default function App() {
       <Header />
       <Routes>
         <Route path="/" element={<MainPage />} />
-        <Route path="/movie" element={<MoviePage />} />
-        <Route path="/session" element={<SessionPage />} />
+        <Route path="/movie/:MOVIE_ID" element={<MoviePage />} />
+        <Route path="/session/:SESSION_ID" element={<SessionPage />} />
         <Route path="/success" element={<SuccessPage />} />
       </Routes>
       <GlobalStyle />

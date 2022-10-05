@@ -1,11 +1,12 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 export default function MainPage() {
   const [moviesList, setMoviesList] = useState([]);
   useEffect(() => {
-    const URL = "https://mock-api.driven.com.br/api/v8/cineflex/movies";
+    const URL = "https://mock-api.driven.com.br/api/v5/cineflex/movies";
     axios
       .get(URL)
       .then((r) => {
@@ -19,7 +20,9 @@ export default function MainPage() {
       <span>Selecione o filme</span>
       <div>
         {moviesList.map((m) => (
-          <img key={m.id} src={m.posterURL} alt={m.title} />
+          <Link key={m.id} to={`/movie/${m.id}`}>
+            <img key={m.id} src={m.posterURL} alt={m.title} />
+          </Link>
         ))}
       </div>
     </MainPageStyled>
@@ -57,6 +60,6 @@ const MainPageStyled = styled.div`
     padding: 8px;
     box-shadow: 0px 2px 4px 2px rgba(0, 0, 0, 0.1);
     border-radius: 3px;
-    background: #FFFFFF;
+    background: #ffffff;
   }
 `;
