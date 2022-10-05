@@ -39,7 +39,7 @@ const MovieInfoStyled = styled.div`
   span {
     font-style: normal;
     font-weight: 400;
-    font-size: 22px;
+    font-size: 20px;
     line-height: 30px;
     color: #293845;
   }

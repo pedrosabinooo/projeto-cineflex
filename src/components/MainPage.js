@@ -5,7 +5,7 @@ import styled from "styled-components";
 export default function MainPage() {
   const [moviesList, setMoviesList] = useState([]);
   useEffect(() => {
-    const URL = "https://mock-api.driven.com.br/api/v5/cineflex/movies";
+    const URL = "https://mock-api.driven.com.br/api/v8/cineflex/movies";
     axios
       .get(URL)
       .then((r) => {

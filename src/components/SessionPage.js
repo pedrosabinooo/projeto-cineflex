@@ -6,6 +6,7 @@ import Footer from "./Footer";
 export default function SessionPage() {
   const [session, setSession] = useState({});
   const [seats, setSeats] = useState([]);
+  const [selectedSeat, setSelectedSeat] = useState([]);
   const ID_DA_SESSAO = 1;
 
   useEffect(() => {
@@ -24,7 +25,18 @@ export default function SessionPage() {
       .catch((e) => console.log(e.response.data));
   }, []);
 
-  console.log(session);
+  console.log(seats);
+  console.log(selectedSeat);
+
+  function chooseSeat(s) {
+    if (s.isAvailable) {
+      if (selectedSeat.includes(s.name)) {
+        setSelectedSeat(selectedSeat.filter((selected) => selected !== s.name));
+      } else {
+        setSelectedSeat([...selectedSeat, s.name]);
+      }
+    }
+  }
 
   return (
     <>
@@ -32,12 +44,37 @@ export default function SessionPage() {
         <span>Selecione o(s) assento(s)</span>
         <SeatsStyled>
           {seats.map((s) => (
-            <SeatStyled key={s.id}>{s.name}</SeatStyled>
+            <SeatStyled
+              key={s.id}
+              isAvailable={s.isAvailable}
+              isSelected={selectedSeat.includes(s.name)}
+              onClick={() => chooseSeat(s)}
+            >
+              {s.name}
+            </SeatStyled>
           ))}
         </SeatsStyled>
-        <div>Legenda</div>
-        <div>Formulário</div>
-        <ScheduleButtomStyled>Reservar assento(s)</ScheduleButtomStyled>
+        <SeatLegendStyled>
+          <div>
+            <SeatStyled isAvailable={true} isSelected={true} className="legend" />
+            <p>Selecionado</p>
+          </div>
+          <div>
+            <SeatStyled isAvailable={true} isSelected={false} className="legend" />
+            <p>Disponível</p>
+          </div>
+          <div>
+            <SeatStyled isAvailable={false} isSelected={false} className="legend" />
+            <p>Indiponível</p>
+          </div>
+        </SeatLegendStyled>
+        <SessionPageFormStyled id="SessionPageForm">
+          <p>Nome do comprador:</p>
+          <input placeholder="Digite seu nome..." required></input>
+          <p>CPF do comprador:</p>
+          <input placeholder="Digite seu CPF..." required></input>
+        </SessionPageFormStyled>
+        <BookButtomStyled>Reservar assento(s)</BookButtomStyled>
       </SessionPageStyled>
       <Footer
         movieTitle={session.title}
@@ -83,15 +120,58 @@ const SeatStyled = styled.button`
   display: flex;
   width: 26px;
   height: 26px;
-  background: #c3cfd9;
-  border: 1px solid #808f9d;
+  background: ${(props) =>
+    props.isSelected ? "#1AAE9E" : props.isAvailable ? "#c3cfd9" : "#FBE192"};
+  border: 1px solid
+    ${(props) =>
+      props.isSelected ? "#0E7D71" : props.isAvailable ? "#808f9d" : "#F7C52B"};
   border-radius: 12px;
   font-size: 11px;
   align-items: center;
   justify-content: center;
 `;
 
-const ScheduleButtomStyled = styled.button`
+const SeatLegendStyled = styled.div`
+  display: flex;
+  justify-content: space-around;
+  width: 280px;
+  margin: 25px 0;
+  div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .legend {
+    width: 24px;
+    height: 24px;
+  }
+  p {
+    font-size: 11px;
+  }
+`;
+
+const SessionPageFormStyled = styled.form`
+  width: 331.5px;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  input {
+    width: 100%;
+    height: 40px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    border: 1px solid #d5d5d5;
+    border-radius: 3px;
+    padding-left: 10px;
+    &::placeholder {
+      font-style: italic;
+      color: #afafaf;
+    }
+  }
+`;
+
+const BookButtomStyled = styled.button`
   width: 225px;
   height: 40px;
   margin-right: 8px;
