@@ -5,34 +5,48 @@ import Footer from "./Footer";
 
 export default function MoviePage() {
   const [movie, setMovie] = useState({});
+  const [days, setDays] = useState([]);
   const ID_DO_FILME = 1;
+
   useEffect(() => {
     const URL = `https://mock-api.driven.com.br/api/v5/cineflex/movies/${ID_DO_FILME}/showtimes`;
     axios
       .get(URL)
       .then((r) => {
-        console.log(r.data);
-        setMovie(r.data);
+        setMovie({ title: r.data.title, posterURL: r.data.posterURL });
+        setDays(r.data.days);
       })
       .catch((e) => console.log(e.response.data));
   }, []);
-  console.log(movie.days);
-  function days(d) {
-    return (
-      <div key={d.id}>
-        <p>{[d.weekday, " - ", d.date].join("")}</p>
-        {d.showtimes.map((st) => (
-          <button key={st.id}>{st.name}</button>
-        ))}
-      </div>
-    );
-  }
+
+  console.log(movie);
+
   return (
-    <MoviePageStyled>
-      <span>Selecione o horário</span>
-      <div>{movie.days.map((d) => days(d))}</div>
-      <Footer movieTitle={movie.title} movieURL={movie.posterURL} />
-    </MoviePageStyled>
+    <>
+      <MoviePageStyled>
+        <span>Selecione o horário</span>
+        <DaysListStyled>
+          {days.map((d) => (
+            <DayStyled key={d.id}>
+              <p>{[d.weekday, " - ", d.date].join("")}</p>
+              <div>
+                {d.showtimes.map((st) => (
+                  <ShowtimeButtomStyled key={st.id}>
+                    {st.name}
+                  </ShowtimeButtomStyled>
+                ))}
+              </div>
+            </DayStyled>
+          ))}
+        </DaysListStyled>
+      </MoviePageStyled>
+      <Footer
+        movieTitle={movie.title}
+        movieURL={movie.posterURL}
+        weekday={""}
+        showtime={""}
+      />
+    </>
   );
 }
 
@@ -42,7 +56,8 @@ const MoviePageStyled = styled.div`
   justify-content: center;
   align-items: center;
   width: 100%;
-  margin-top: 67px;
+  padding-top: 67px;
+  padding-bottom: 140px;
   span {
     display: flex;
     align-items: center;
@@ -54,18 +69,38 @@ const MoviePageStyled = styled.div`
     font-size: 24px;
     color: #293845;
   }
-  div {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    width: 100%;
-    row-gap: 11px;
-    column-gap: 25px;
+`;
+
+const DaysListStyled = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 85%;
+  row-gap: 20px;
+`;
+
+const DayStyled = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  row-gap: 10px;
+  p {
+    font-size: 19px;
   }
-  img {
-    height: 193px;
-    padding: 8px;
-    box-shadow: 0px 2px 4px 2px rgba(0, 0, 0, 0.1);
-    border-radius: 3px;
-  }
+`;
+
+const ShowtimeButtomStyled = styled.button`
+  width: 70px;
+  height: 40px;
+  margin-right: 8px;
+  background: #e8833a;
+  border: 0;
+  border-radius: 3px;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 21px;
+  vertical-align: center;
+  text-align: center;
+  letter-spacing: 0.02em;
+  color: #ffffff;
 `;
