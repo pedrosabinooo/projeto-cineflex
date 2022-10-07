@@ -18,9 +18,7 @@ export default function MoviePage() {
         setDays(r.data.days);
       })
       .catch((e) => console.log(e.response.data));
-  }, []);
-
-  console.log(movie);
+  }, [MOVIE_ID]);
 
   return (
     <>
@@ -29,11 +27,16 @@ export default function MoviePage() {
         <DaysListStyled>
           {days.map((d) => (
             <DayStyled key={d.id}>
-              <p>{[d.weekday, " - ", d.date].join("")}</p>
+              <p data-identifier="session-date">
+                {[d.weekday, " - ", d.date].join("")}
+              </p>
               <div>
                 {d.showtimes.map((st) => (
                   <Link to={`/session/${st.id}`} key={st.id}>
-                    <ShowtimeButtomStyled key={st.id}>
+                    <ShowtimeButtomStyled
+                      key={st.id}
+                      data-identifier="hour-minute-btn"
+                    >
                       {st.name}
                     </ShowtimeButtomStyled>
                   </Link>
@@ -77,6 +80,7 @@ const MoviePageStyled = styled.div`
 const DaysListStyled = styled.div`
   display: flex;
   flex-direction: column;
+  max-width: 400px;
   width: 85%;
   row-gap: 20px;
 `;
@@ -106,4 +110,8 @@ const ShowtimeButtomStyled = styled.button`
   text-align: center;
   letter-spacing: 0.02em;
   color: #ffffff;
+  &:hover{
+    filter: brightness(0.85);
+    cursor: pointer;
+  }
 `;

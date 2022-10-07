@@ -5,24 +5,34 @@ import styled from "styled-components";
 
 export default function MainPage() {
   const [moviesList, setMoviesList] = useState([]);
+
   useEffect(() => {
     const URL = "https://mock-api.driven.com.br/api/v5/cineflex/movies";
     axios
       .get(URL)
-      .then((r) => {
-        console.log(r.data);
-        setMoviesList(r.data);
-      })
-      .catch((e) => console.log(e.response.data));
+      .then((res) => setMoviesList(res.data))
+      .catch((err) => console.log(err.response.data));
   }, []);
+
+  function Poster({ movie }) {
+    return (
+      <Link key={movie.id} to={`/movie/${movie.id}`}>
+        <img
+          key={movie.id}
+          src={movie.posterURL}
+          alt={movie.title}
+          data-identifier="movie-outdoor"
+        />
+      </Link>
+    );
+  }
+
   return (
     <MainPageStyled>
       <span>Selecione o filme</span>
       <div>
-        {moviesList.map((m) => (
-          <Link key={m.id} to={`/movie/${m.id}`}>
-            <img key={m.id} src={m.posterURL} alt={m.title} />
-          </Link>
+        {moviesList.map((movie) => (
+          <Poster key={movie.id} movie={movie} />
         ))}
       </div>
     </MainPageStyled>
@@ -61,5 +71,9 @@ const MainPageStyled = styled.div`
     box-shadow: 0px 2px 4px 2px rgba(0, 0, 0, 0.1);
     border-radius: 3px;
     background: #ffffff;
+    &:hover {
+      filter: brightness(0.85);
+      cursor: pointer;
+    }
   }
 `;

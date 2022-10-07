@@ -3,8 +3,8 @@ import styled from "styled-components";
 export default function Footer({ movieTitle, movieURL, weekday, showtime }) {
   return (
     <FooterStyled>
-      <img src={movieURL} alt={movieTitle} />
-      <MovieInfoStyled>
+      <img src={movieURL} alt={movieTitle} data-identifier="movie-img-preview" />
+      <MovieInfoStyled data-identifier="movie-and-session-infos-preview">
         <span>{movieTitle}</span>
         <span>{(weekday ? weekday+" - " : "")+(showtime ? showtime : "")}</span>
       </MovieInfoStyled>
@@ -15,6 +15,7 @@ export default function Footer({ movieTitle, movieURL, weekday, showtime }) {
 const FooterStyled = styled.footer`
   display: flex;
   align-items: center;
+  justify-content: center;
   position: fixed;
   z-index: 10;
   width: 100%;

@@ -1,39 +1,65 @@
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 
-export default function SuccessPage() {
-  const movieInfo = {
-    title: "Enola Holmes",
-    date: "13/05/2023",
-    session: "15:00",
-  };
-  const seats = [1, 2, 3];
-  const buyerInfo = { name: "José da Silva Sauro", cpf: 90389479212 };
+export default function SuccessPage({ orderInfo, setOrderInfo }) {
+  function SessionInfo() {
+    return (
+      <div className="info-container">
+        <span className="bold">Filme e sessão</span>
+        <span data-identifier="movie-session-infos-reserve-finished">
+          {orderInfo.sessionInfo.title}
+        </span>
+        <span data-identifier="movie-session-infos-reserve-finished">
+          {orderInfo.sessionInfo.date + " " + orderInfo.sessionInfo.showtime}
+        </span>
+      </div>
+    );
+  }
+
+  function SelectedSeats() {
+    return (
+      <div className="info-container">
+        <span className="bold">Ingressos</span>
+        {orderInfo.selectedSeats.map((s) => (
+          <span key={s} data-identifier="seat-infos-reserve-finished">
+            {"Assento " + s}
+          </span>
+        ))}
+      </div>
+    );
+  }
+
+  function BuyerInfo() {
+    return (
+      <div className="info-container">
+        <span className="bold">Comprador</span>
+        <span data-identifier="buyer-infos-reserve-finished">
+          {"Nome: " + orderInfo.buyerInfo.name}
+        </span>
+        <span data-identifier="buyer-infos-reserve-finished">
+          {"CPF: " + orderInfo.buyerInfo.cpf}
+        </span>
+      </div>
+    );
+  }
+
   return (
-    <>
-      <SuccessPageStyled>
-        <span className="bold success">Pedido feito com sucesso!</span>
-        <div className="info-container">
-          <span className="bold">Filme e sessão</span>
-          <span>{movieInfo.title}</span>
-          <span>{movieInfo.date + " " + movieInfo.session}</span>
-        </div>
-        <div className="info-container">
-          <span className="bold">Ingressos</span>
-          {seats.map((s) => (
-            <span key={s}>{"Assento " + s}</span>
-          ))}
-        </div>
-        <div className="info-container">
-          <span className="bold">Comprador</span>
-          <span>{"Nome: " + buyerInfo.name}</span>
-          <span>{"CPF: " + buyerInfo.cpf}</span>
-        </div>
-        <Link to="/">
-          <HomeButtomStyled>Voltar para a Home</HomeButtomStyled>
-        </Link>
-      </SuccessPageStyled>
-    </>
+    <SuccessPageStyled>
+      <span className="bold success">Pedido feito com sucesso!</span>
+
+      <SessionInfo />
+      <SelectedSeats />
+      <BuyerInfo />
+
+      <Link to="/">
+        <HomeButtomStyled
+          onClick={() => setOrderInfo({})}
+          data-identifier="back-to-home-btn"
+        >
+          Voltar para a Home
+        </HomeButtomStyled>
+      </Link>
+    </SuccessPageStyled>
   );
 }
 
@@ -86,4 +112,8 @@ const HomeButtomStyled = styled.button`
   text-align: center;
   letter-spacing: 0.02em;
   color: #ffffff;
+  &:hover {
+    filter: brightness(0.95);
+    cursor: pointer;
+  }
 `;

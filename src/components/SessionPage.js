@@ -1,44 +1,33 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import Footer from "./Footer";
 
-export default function SessionPage() {
-  const [session, setSession] = useState({});
+export default function SessionPage({ setOrderInfo }) {
   const [seats, setSeats] = useState([]);
   const [selectedSeats, setSelectedSeats] = useState([]);
+  const [sessionInfo, setSessionInfo] = useState({});
+  const [buyerInfo, setBuyerInfo] = useState({name:"",cpf:""});
   const { SESSION_ID } = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const URL = `https://mock-api.driven.com.br/api/v5/cineflex/showtimes/${SESSION_ID}/seats`;
     axios
       .get(URL)
       .then((r) => {
-        setSession({
+        setSessionInfo({
           title: r.data.movie.title,
           posterURL: r.data.movie.posterURL,
           weekday: r.data.day.weekday,
+          date: r.data.day.date,
           showtime: r.data.name,
         });
         setSeats(r.data.seats);
       })
       .catch((e) => console.log(e.response.data));
-  }, []);
-
-  function bookSeat(bookingInfo) {
-    const URL = `https://mock-api.driven.com.br/api/v5/cineflex/seats/book-many`;
-    axios
-      .post(URL, bookingInfo)
-      .then((r) => {
-        console.log(bookingInfo);
-        console.log(r.data);
-      })
-      .catch((e) => console.log(e.response.data));
-  }
-
-  console.log(seats);
-  console.log(selectedSeats);
+  }, [SESSION_ID]);
 
   function chooseSeat(s) {
     if (s.isAvailable) {
@@ -49,7 +38,36 @@ export default function SessionPage() {
       } else {
         setSelectedSeats([...selectedSeats, s.name]);
       }
+    } else {
+      alert("Esse assento não está disponível");
     }
+  }
+
+  function handleForm(e) {
+    setBuyerInfo({ ...buyerInfo, [e.target.name]: e.target.value });
+  }
+
+  function bookSeats(e) {
+    e.preventDefault();
+    const URL = `https://mock-api.driven.com.br/api/v5/cineflex/seats/book-many`;
+    const body = { ...buyerInfo, ids: [...selectedSeats] };
+    axios
+      .post(URL, body)
+      .then((r) => {
+        console.log(r.data);
+        setOrderInfo({
+          sessionInfo: { ...sessionInfo },
+          buyerInfo: { ...buyerInfo },
+          selectedSeats: [...selectedSeats],
+        });
+        console.log({
+            sessionInfo: { ...sessionInfo },
+            buyerInfo: { ...buyerInfo },
+            selectedSeats: [...selectedSeats],
+          });
+        navigate("/success");
+      })
+      .catch((e) => console.log(e.response.data));
   }
 
   return (
@@ -63,6 +81,7 @@ export default function SessionPage() {
               isAvailable={s.isAvailable}
               isSelected={selectedSeats.includes(s.name)}
               onClick={() => chooseSeat(s)}
+              data-identifier="seat"
             >
               {s.name}
             </SeatStyled>
@@ -74,6 +93,7 @@ export default function SessionPage() {
               isAvailable={true}
               isSelected={true}
               className="legend"
+              data-identifier="seat-selected-subtitle"
             />
             <p>Selecionado</p>
           </div>
@@ -82,6 +102,7 @@ export default function SessionPage() {
               isAvailable={true}
               isSelected={false}
               className="legend"
+              data-identifier="seat-available-subtitle"
             />
             <p>Disponível</p>
           </div>
@@ -90,35 +111,42 @@ export default function SessionPage() {
               isAvailable={false}
               isSelected={false}
               className="legend"
+              data-identifier="seat-unavailable-subtitle"
             />
             <p>Indiponível</p>
           </div>
         </SeatLegendStyled>
-        <SessionPageFormStyled id="SessionPageForm">
-          <p>Nome do comprador:</p>
-          <input placeholder="Digite seu nome..." required></input>
-          <p>CPF do comprador:</p>
-          <input placeholder="Digite seu CPF..." required></input>
-        </SessionPageFormStyled>
-        <Link to="/success">
-          <BookButtomStyled
-            onClick={() =>
-              bookSeat({
-                ids: selectedSeats,
-                name: "Fulano",
-                cpf: "12312312312",
-              })
-            }
-          >
+        <SessionPageFormStyled onSubmit={bookSeats}>
+          <label htmlFor="name">Nome do comprador:</label>
+          <input
+            id="name"
+            name="name"
+            value={buyerInfo.name}
+            onChange={handleForm}
+            placeholder="Digite seu nome..."
+            data-identifier="buyer-name-input"
+            required
+          ></input>
+          <label htmlFor="cpf">CPF do comprador:</label>
+          <input
+            id="cpf"
+            name="cpf"
+            value={buyerInfo.cpf}
+            onChange={handleForm}
+            placeholder="Digite seu CPF..."
+            data-identifier="buyer-cpf-input"
+            required
+          ></input>
+          <BookButtomStyled type="submit" data-identifier="reservation-btn">
             Reservar assento(s)
           </BookButtomStyled>
-        </Link>
+        </SessionPageFormStyled>
       </SessionPageStyled>
       <Footer
-        movieTitle={session.title}
-        movieURL={session.posterURL}
-        weekday={session.weekday}
-        showtime={session.showtime}
+        movieTitle={sessionInfo.title}
+        movieURL={sessionInfo.posterURL}
+        weekday={sessionInfo.weekday}
+        showtime={sessionInfo.showtime}
       />
     </>
   );
@@ -146,11 +174,11 @@ const SessionPageStyled = styled.div`
 `;
 
 const SeatsStyled = styled.div`
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
   width: 331.5px;
   row-gap: 20px;
-  column-gap: 7px;
+  justify-content: space-between;
   margin-top: -20px;
 `;
 
@@ -158,6 +186,7 @@ const SeatStyled = styled.button`
   display: flex;
   width: 26px;
   height: 26px;
+  justify-self: center;
   background: ${(props) =>
     props.isSelected ? "#1AAE9E" : props.isAvailable ? "#c3cfd9" : "#FBE192"};
   border: 1px solid
@@ -167,13 +196,17 @@ const SeatStyled = styled.button`
   font-size: 11px;
   align-items: center;
   justify-content: center;
+  &:hover {
+    filter: brightness(${(props) => (props.isAvailable ? 0.85 : 1)});
+    cursor: ${(props) => (props.isAvailable ? "pointer" : "not-allowed")};
+  }
 `;
 
 const SeatLegendStyled = styled.div`
   display: flex;
   justify-content: space-around;
   width: 280px;
-  margin: 25px 0;
+  margin: 30px 0;
   div {
     display: flex;
     flex-direction: column;
@@ -184,12 +217,18 @@ const SeatLegendStyled = styled.div`
     width: 24px;
     height: 24px;
   }
+  .legend:hover {
+    filter: brightness(1);
+    cursor: default;
+  }
   p {
     font-size: 11px;
   }
 `;
 
 const SessionPageFormStyled = styled.form`
+  display: flex;
+  flex-direction: column;
   width: 331.5px;
   font-style: normal;
   font-weight: 400;
@@ -198,7 +237,7 @@ const SessionPageFormStyled = styled.form`
     width: 100%;
     height: 40px;
     margin-top: 5px;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
     border: 1px solid #d5d5d5;
     border-radius: 3px;
     padding-left: 10px;
@@ -224,4 +263,9 @@ const BookButtomStyled = styled.button`
   letter-spacing: 0.02em;
   color: #ffffff;
   margin-top: 30px;
+  align-self: center;
+  &:hover {
+    filter: brightness(0.95);
+    cursor: pointer;
+  }
 `;
