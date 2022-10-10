@@ -61,6 +61,7 @@ const MoviePageStyled = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  max-width: 600px;
   width: 100%;
   padding-top: 67px;
   padding-bottom: 140px;
@@ -110,7 +111,7 @@ const ShowtimeButtomStyled = styled.button`
   text-align: center;
   letter-spacing: 0.02em;
   color: #ffffff;
-  &:hover{
+  &:hover {
     filter: brightness(0.85);
     cursor: pointer;
   }

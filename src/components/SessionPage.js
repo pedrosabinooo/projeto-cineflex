@@ -8,7 +8,7 @@ export default function SessionPage({ setOrderInfo }) {
   const [seats, setSeats] = useState([]);
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [sessionInfo, setSessionInfo] = useState({});
-  const [buyerInfo, setBuyerInfo] = useState({name:"",cpf:""});
+  const [buyerInfo, setBuyerInfo] = useState({ name: "", cpf: "" });
   const { SESSION_ID } = useParams();
   const navigate = useNavigate();
 
@@ -26,17 +26,17 @@ export default function SessionPage({ setOrderInfo }) {
         });
         setSeats(r.data.seats);
       })
-      .catch((e) => console.log(e.response.data));
+      .catch((e) => alert(e.response.data));
   }, [SESSION_ID]);
 
-  function chooseSeat(s) {
-    if (s.isAvailable) {
-      if (selectedSeats.includes(s.name)) {
+  function chooseSeat(seat) {
+    if (seat.isAvailable) {
+      if (selectedSeats.includes(seat.name)) {
         setSelectedSeats(
-          selectedSeats.filter((selected) => selected !== s.name)
+          selectedSeats.filter((selected) => selected !== seat.name)
         );
       } else {
-        setSelectedSeats([...selectedSeats, s.name]);
+        setSelectedSeats([...selectedSeats, seat.name]);
       }
     } else {
       alert("Esse assento não está disponível");
@@ -54,20 +54,14 @@ export default function SessionPage({ setOrderInfo }) {
     axios
       .post(URL, body)
       .then((r) => {
-        console.log(r.data);
         setOrderInfo({
           sessionInfo: { ...sessionInfo },
           buyerInfo: { ...buyerInfo },
           selectedSeats: [...selectedSeats],
         });
-        console.log({
-            sessionInfo: { ...sessionInfo },
-            buyerInfo: { ...buyerInfo },
-            selectedSeats: [...selectedSeats],
-          });
         navigate("/success");
       })
-      .catch((e) => console.log(e.response.data));
+      .catch((e) => alert(e.response.data));
   }
 
   return (
@@ -75,15 +69,15 @@ export default function SessionPage({ setOrderInfo }) {
       <SessionPageStyled>
         <span>Selecione o(s) assento(s)</span>
         <SeatsStyled>
-          {seats.map((s) => (
+          {seats.map((seat) => (
             <SeatStyled
-              key={s.id}
-              isAvailable={s.isAvailable}
-              isSelected={selectedSeats.includes(s.name)}
-              onClick={() => chooseSeat(s)}
+              key={seat.id}
+              isAvailable={seat.isAvailable}
+              isSelected={selectedSeats.includes(seat.name)}
+              onClick={() => chooseSeat(seat)}
               data-identifier="seat"
             >
-              {s.name}
+              {seat.name}
             </SeatStyled>
           ))}
         </SeatsStyled>
@@ -157,6 +151,7 @@ const SessionPageStyled = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  max-width: 600px;
   width: 100%;
   padding-top: 67px;
   padding-bottom: 140px;

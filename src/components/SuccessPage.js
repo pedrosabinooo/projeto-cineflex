@@ -69,6 +69,7 @@ const SuccessPageStyled = styled.div`
   justify-content: center;
   align-items: center;
   width: 100%;
+  max-width: 600px;
   padding-top: 67px;
   .info-container {
     width: 85%;

@@ -18,9 +18,7 @@ export default function App() {
         <Route path="/movie/:MOVIE_ID" element={<MoviePage />} />
         <Route
           path="/session/:SESSION_ID"
-          element={
-            <SessionPage setOrderInfo={setOrderInfo} />
-          }
+          element={<SessionPage setOrderInfo={setOrderInfo} />}
         />
         <Route
           path="/success"

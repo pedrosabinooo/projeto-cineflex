@@ -4,14 +4,14 @@ import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 export default function MainPage() {
-  const [moviesList, setMoviesList] = useState([]);
+  const [catalog, setCatalog] = useState([]);
 
   useEffect(() => {
     const URL = "https://mock-api.driven.com.br/api/v5/cineflex/movies";
     axios
       .get(URL)
-      .then((res) => setMoviesList(res.data))
-      .catch((err) => console.log(err.response.data));
+      .then((res) => setCatalog(res.data))
+      .catch((err) => alert(err.response.data));
   }, []);
 
   function Poster({ movie }) {
@@ -31,7 +31,7 @@ export default function MainPage() {
     <MainPageStyled>
       <span>Selecione o filme</span>
       <div>
-        {moviesList.map((movie) => (
+        {catalog.map((movie) => (
           <Poster key={movie.id} movie={movie} />
         ))}
       </div>
@@ -44,6 +44,7 @@ const MainPageStyled = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  max-width: 600px;
   width: 100%;
   margin-top: 67px;
   span {

@@ -51,6 +51,10 @@ const GlobalStyle = createGlobalStyle`
     .root {
         height: 100vh;
         font-family: "Roboto";
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
     }
 `;
 
